@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Net;
 using System.Net.Http;
+using System.Security.Claims;
 using System.Web.Http;
 using System.Web.Http.Cors;
 
@@ -16,6 +17,7 @@ namespace AuthendicationWithAngular.Controllers
     {
         [Route("api/User/Register")]
         [HttpPost]
+        [AllowAnonymous]
         public IdentityResult Register(AccountModel model)
         {
             var userStore = new UserStore<IdentityModels>(new ApplicationDbContext());
@@ -30,6 +32,23 @@ namespace AuthendicationWithAngular.Controllers
             IdentityResult result = manager.Create(user, model.Password);
 
             return result;
+        }
+
+        [HttpGet]
+        [Route("api/GetUserClaims")]
+        public AccountModel GetUserClaims()
+        {
+            var identityClaims = (ClaimsIdentity)User.Identity;
+            IEnumerable<Claim> claims = identityClaims.Claims;
+            AccountModel model = new AccountModel()
+            {
+                UserName = identityClaims.FindFirst("Username").Value,
+                Email = identityClaims.FindFirst("Email").Value,
+                FirstName = identityClaims.FindFirst("FirstName").Value,
+                LastName = identityClaims.FindFirst("LastName").Value,
+                LoggedOn = identityClaims.FindFirst("LoggedOn").Value
+            };
+            return model;
         }
     }
 }
