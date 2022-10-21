@@ -30,9 +30,10 @@ namespace AuthendicationWithAngular.Controllers
                 RequiredLength = 3
             };
             IdentityResult result = manager.Create(user, model.Password);
-
+            manager.AddToRoles(user.Id, model.Roles);
             return result;
         }
+
 
         [HttpGet]
         [Route("api/GetUserClaims")]
@@ -49,6 +50,30 @@ namespace AuthendicationWithAngular.Controllers
                 LoggedOn = identityClaims.FindFirst("LoggedOn").Value
             };
             return model;
+        }
+
+        [HttpGet]
+        [Authorize(Roles = "Admin")]
+        [Route("api/ForAdminRole")]
+        public string ForAdminRole()
+        {
+            return "for admin role";
+        }
+
+        [HttpGet]
+        [Authorize(Roles = "Employee")]
+        [Route("api/ForEmployeeRole")]
+        public string ForAuthorRole()
+        {
+            return "For Employee role";
+        }
+
+        [HttpGet]
+        [Authorize(Roles = "Employee,Visitor")]
+        [Route("api/ForEmployeeOrVisitor")]
+        public string ForAuthorOrReader()
+        {
+            return "For Employee/Visitor role";
         }
     }
 }
